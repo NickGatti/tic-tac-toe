@@ -38,6 +38,7 @@ window.onload = function() {
             e.target.style.color = 'black'
         }
         e.target.textContent = 'X'
+        console.log('got here')
         gameStats.player = !gameStats.player
         let player = null
         let playerColor = null
@@ -51,20 +52,16 @@ window.onload = function() {
         document.getElementById('gameBar').textContent = player + "'s turn!"
         document.getElementById('gameBar').style.color = playerColor
         let gameData = sendCellData()
-        let state = checkForRowsWins(gameData)
-        let state2 = checkForColumnWins(gameData)
+        let state = checkForWins(gameData)
         if (state !== null) {
             if (state.player === true) {
-                alert(gameStats.playerTwo + ' won!')
+                setTimeout(function() {
+                    alert(gameStats.playerTwo + ' won!')
+                }, 50)
             } else {
-                alert(gameStats.playerOne + ' won!')
-            }
-        }
-        if (state2 !== null) {
-            if (state2.player === true) {
-                alert(gameStats.playerTwo + ' won!')
-            } else {
-                alert(gameStats.playerOne + ' won!')
+                setTimeout(function() {
+                    alert(gameStats.playerOne + ' won!')
+                }, 50)
             }
         }
     }
@@ -134,7 +131,30 @@ window.onload = function() {
     }
 
     function checkForDiagonalWins(data) {
+        let newData = [
+            new Array(3),
+            new Array(3)
+        ]
+        newData[0][0] = data[0][0]
+        newData[0][1] = data[1][1]
+        newData[0][2] = data[2][2]
 
+        newData[1][0] = data[2][0]
+        newData[1][1] = data[1][1]
+        newData[1][2] = data[0][2]
+
+        return checkForRowsWins(newData)
+    }
+
+    function checkForWins(data) {
+        let state = checkForRowsWins(data)
+        if (state === null) {
+            state = checkForColumnWins(data)
+            if (state === null) {
+                state = checkForDiagonalWins(data)
+            }
+        }
+        return state
     }
 }
 
