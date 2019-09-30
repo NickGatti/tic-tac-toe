@@ -21,8 +21,8 @@ window.onload = function() {
     }
 
     function startGame() {
-        let playerOne = 'Nick'//window.prompt('Enter play one\'s name')
-        let playerTwo = 'Donny'//window.prompt('Enter play two\'s name')
+        let playerOne = window.prompt('Enter play one\'s name')
+        let playerTwo = window.prompt('Enter play two\'s name')
         gameStats.playerOne = playerOne
         gameStats.playerTwo = playerTwo
         document.getElementById('gameBar').textContent = playerOne + "'s turn!"
@@ -38,7 +38,6 @@ window.onload = function() {
             e.target.style.color = 'black'
         }
         e.target.textContent = 'X'
-        console.log('got here')
         gameStats.player = !gameStats.player
         let player = null
         let playerColor = null
@@ -57,10 +56,14 @@ window.onload = function() {
             if (state.player === true) {
                 setTimeout(function() {
                     alert(gameStats.playerTwo + ' won!')
+                    document.getElementById('app').innerHTML = ''
+                    init()
                 }, 50)
             } else {
                 setTimeout(function() {
                     alert(gameStats.playerOne + ' won!')
+                    document.getElementById('app').innerHTML = ''
+                    init()
                 }, 50)
             }
         }
