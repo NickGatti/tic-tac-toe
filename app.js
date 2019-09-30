@@ -2,7 +2,9 @@ window.onload = function() {
     let gameStats = {
         player: false,
         playerOne: '',
-        playerTwo: ''
+        playerTwo: '',
+        lastWinner: Math.floor(Math.random() * 2) ? true : false,
+        totalChecked: 0
     }
 
     init()
@@ -11,9 +13,11 @@ window.onload = function() {
         handleCellClick(e)
     })
 
-    startGame()
+    startPreGame()
+    handlePlayerSelection()
 
     function init() {
+        document.getElementById('app').innerHTML = ''
         for (let i = 0; i < 9; i++) {
             let div = document.createElement("div");
             div.className = 'cell'
@@ -23,53 +27,94 @@ window.onload = function() {
         }
     }
 
-    function startGame() {
+    function startPreGame() {
         let playerOne = 'Nick' //window.prompt('Enter play one\'s name')
         let playerTwo = 'Donny' //window.prompt('Enter play two\'s name')
         gameStats.playerOne = playerOne
         gameStats.playerTwo = playerTwo
-        document.getElementById('gameBar').textContent = playerOne + "'s turn!"
+    }
+
+    function updateGameBar() {
+        color = getPlayerColor()
+        player = getPlayer()
+        document.getElementById('gameBar').textContent = player + "'s turn!"
+        document.getElementById('gameBar').style.color = color
+    }
+
+    function getPlayerColor() {
+        if (gameStats.player) {
+            return 'red'
+        } else {
+            return 'black'
+        }        
+    }
+
+    function getPlayer() {
+        if (gameStats.player) {
+            return gameStats.playerTwo
+        } else {
+            return gameStats.playerOne
+        }        
+    }
+
+    function handlePlayerSelection() {
+        let startingPlayer = null
+        if (gameStats.lastWinner === true) {
+            startingPlayer = gameStats.playerTwo
+            gameStats.player = true
+        } else {
+            startingPlayer = gameStats.playerOne
+            gameStats.player = false
+        }
+        color = getPlayerColor()
+        updateGameBar(startingPlayer, color)
+    }
+
+    function handleEnd(winner, winnerFlag) {
+        gameStats.totalChecked = 0
+        if (winner) {
+            handleWin(winner, winnerFlag)
+        } else {
+            handleDraw()
+        }
+        init()
+        handlePlayerSelection()
+    }
+
+    function handleWin(winner, winnerFlag) {
+        alert(winner + ' won!')
+        gameStats.lastWinner = winnerFlag
+    }
+
+    function handleDraw() {
+        alert('Draw!')
     }
 
     function handleCellClick(e) {
         if (e.target.textContent === 'X') {
             return
         }
-        if (gameStats.player) {
-            e.target.style.color = 'red'
-        } else {
-            e.target.style.color = 'black'
-        }
+
+        let color = getPlayerColor()
+        e.target.style.color = color
         e.target.textContent = 'X'
+
+        switchPlayer()
+        getWinData()
+    }
+
+    function checkTotalPlays() {
+        gameStats.totalChecked++
+        if (gameStats.totalChecked === 9) {
+            handleEnd()
+        }
+    }
+
+    function switchPlayer() {
         gameStats.player = !gameStats.player
-        let player = null
-        let playerColor = null
-        if (gameStats.player) {
-            player = gameStats.playerTwo
-            playerColor = 'red'
-        } else {
-            player = gameStats.playerOne
-            playerColor = 'black'
-        }
-        document.getElementById('gameBar').textContent = player + "'s turn!"
-        document.getElementById('gameBar').style.color = playerColor
-        let gameData = sendCellData()
-        let state = checkForWins(gameData)
-        if (state !== null) {
-            if (state.player === true) {
-                setTimeout(function() {
-                    alert(gameStats.playerTwo + ' won!')
-                    document.getElementById('app').innerHTML = ''
-                    init()
-                }, 50)
-            } else {
-                setTimeout(function() {
-                    alert(gameStats.playerOne + ' won!')
-                    document.getElementById('app').innerHTML = ''
-                    init()
-                }, 50)
-            }
-        }
+        color = getPlayerColor()
+        player = getPlayer()
+        updateGameBar(player, color)
     }
 
     function sendCellData() {
@@ -152,7 +197,7 @@ window.onload = function() {
         return checkForRowsWins(newData)
     }
 
-    function checkForWins(data) {
+    function checkAllRowsColumnsAndDiagonals(data) {
         let state = checkForRowsWins(data)
         if (state === null) {
             state = checkForColumnWins(data)
@@ -161,6 +206,24 @@ window.onload = function() {
             }
         }
         return state
+    }
+
+    function getWinData() {
+        let gameData = sendCellData()
+        let state = checkAllRowsColumnsAndDiagonals(gameData)
+        if (state !== null) {
+            if (state.player === true) {
+                setTimeout(function() {
+                    handleEnd(gameStats.playerTwo, true)
+                }, 50)
+            } else {
+                setTimeout(function() {
+                    handleEnd(gameStats.playerOne, false)
+                }, 50)
+            }
+        } else {
+            checkTotalPlays()
+        }
     }
 }
 
