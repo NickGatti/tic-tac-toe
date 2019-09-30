@@ -7,13 +7,16 @@ window.onload = function() {
 
     init()
 
+    document.getElementById('app').addEventListener('click', function(e) {
+        handleCellClick(e)
+    })
+
     startGame()
 
     function init() {
         for (let i = 0; i < 9; i++) {
             let div = document.createElement("div");
             div.className = 'cell'
-            div.onclick = handleCellClick
             div.textContent = ''
             div.id = 'cell_num_' + i
             document.getElementById('app').appendChild(div)
@@ -21,8 +24,8 @@ window.onload = function() {
     }
 
     function startGame() {
-        let playerOne = window.prompt('Enter play one\'s name')
-        let playerTwo = window.prompt('Enter play two\'s name')
+        let playerOne = 'Nick' //window.prompt('Enter play one\'s name')
+        let playerTwo = 'Donny' //window.prompt('Enter play two\'s name')
         gameStats.playerOne = playerOne
         gameStats.playerTwo = playerTwo
         document.getElementById('gameBar').textContent = playerOne + "'s turn!"
@@ -82,7 +85,7 @@ window.onload = function() {
                 let cell = document.getElementById(id)
                 let data = {
                     text: cell.innerText === 'X',
-                    player: cell.style.color === 'red' ? true : false
+                    player: cell.style.color === 'red'
                 }
                 inner.push(data)
             }
