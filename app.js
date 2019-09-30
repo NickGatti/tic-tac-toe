@@ -4,7 +4,10 @@ window.onload = function() {
         playerOne: '',
         playerTwo: '',
         lastWinner: Math.floor(Math.random() * 2) ? true : false,
-        totalChecked: 0
+        totalChecked: 0,
+        draws: 0,
+        playerOneWins: 0,
+        playerTwoWins: 0
     }
 
     init()
@@ -14,6 +17,7 @@ window.onload = function() {
     })
 
     startPreGame()
+    updateGameBar()
     handlePlayerSelection()
 
     function init() {
@@ -34,11 +38,15 @@ window.onload = function() {
         gameStats.playerTwo = playerTwo
     }
 
-    function updateGameBar() {
+    function updateTurnBar() {
         color = getPlayerColor()
         player = getPlayer()
-        document.getElementById('gameBar').textContent = player + "'s turn!"
-        document.getElementById('gameBar').style.color = color
+        document.getElementById('turnBar').textContent = player + "'s turn!"
+        document.getElementById('turnBar').style.color = color
+    }
+
+    function updateGameBar() {
+        document.getElementById('gameBar').textContent = `${gameStats.draws} Draws : ${gameStats.playerOneWins} ${gameStats.playerOne} Wins : ${gameStats.playerTwoWins} ${gameStats.playerTwo} Wins`
     }
 
     function getPlayerColor() {
@@ -67,14 +75,22 @@ window.onload = function() {
             gameStats.player = false
         }
         color = getPlayerColor()
-        updateGameBar(startingPlayer, color)
+        updateTurnBar(startingPlayer, color)
     }
 
-    function handleEnd(winner, winnerFlag) {
+    function handleEnd(draw, winner, winnerFlag) {
         gameStats.totalChecked = 0
-        if (winner) {
+        if (!draw) {
+            if (winner === gameStats.playerTwo) {
+                gameStats.playerTwoWins++
+            } else {
+                gameStats.playerOneWins++
+            }
+            updateGameBar()
             handleWin(winner, winnerFlag)
         } else {
+            gameStats.draws++
+            updateGameBar()
             handleDraw()
         }
         init()
@@ -106,7 +122,7 @@ window.onload = function() {
     function checkTotalPlays() {
         gameStats.totalChecked++
         if (gameStats.totalChecked === 9) {
-            handleEnd()
+            handleEnd(true)
         }
     }
 
@@ -114,7 +130,7 @@ window.onload = function() {
         gameStats.player = !gameStats.player
         color = getPlayerColor()
         player = getPlayer()
-        updateGameBar(player, color)
+        updateTurnBar(player, color)
     }
 
     function sendCellData() {
@@ -214,11 +230,11 @@ window.onload = function() {
         if (state !== null) {
             if (state.player === true) {
                 setTimeout(function() {
-                    handleEnd(gameStats.playerTwo, true)
+                    handleEnd(false, gameStats.playerTwo, true)
                 }, 50)
             } else {
                 setTimeout(function() {
-                    handleEnd(gameStats.playerOne, false)
+                    handleEnd(false, gameStats.playerOne, false)
                 }, 50)
             }
         } else {
