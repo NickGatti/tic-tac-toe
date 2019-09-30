@@ -34,6 +34,29 @@ window.onload = function() {
         }
         e.target.textContent = 'X'
         gameStats.player = !gameStats.player
+        let gameData = sendCellData()
+        
+    }
+
+    function sendCellData() {
+        let output = []
+        let inner = []
+        for (let i = 0; i < 10; i++) {
+            if (i % 3 === 0 && i > 0) {
+                output.push(inner)
+                inner = []
+            }
+            if (i < 9) {
+                let id = 'cell_num_' + i
+                let cell = document.getElementById(id)
+                let data = {
+                    text: cell.innerText === 'X',
+                    player: cell.style.color === 'red' ? true : false
+                }
+                inner.push(data)
+            }
+        }
+        return output
     }
 }
 
