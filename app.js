@@ -1,6 +1,8 @@
 window.onload = function() {
     let gameStats = {
-        player: false
+        player: false,
+        playerOne: '',
+        playerTwo: ''
     }
 
     init()
@@ -21,6 +23,9 @@ window.onload = function() {
     function startGame() {
         let playerOne = 'Nick'//window.prompt('Enter play one\'s name')
         let playerTwo = 'Donny'//window.prompt('Enter play two\'s name')
+        gameStats.playerOne = playerOne
+        gameStats.playerTwo = playerTwo
+        document.getElementById('gameBar').textContent = playerOne + "'s turn!"
     }
 
     function handleCellClick(e) {
@@ -34,6 +39,17 @@ window.onload = function() {
         }
         e.target.textContent = 'X'
         gameStats.player = !gameStats.player
+        let player = null
+        let playerColor = null
+        if (gameStats.player) {
+            player = gameStats.playerTwo
+            playerColor = 'red'
+        } else {
+            player = gameStats.playerOne
+            playerColor = 'black'
+        }
+        document.getElementById('gameBar').textContent = player + "'s turn!"
+        document.getElementById('gameBar').style.color = playerColor
         let gameData = sendCellData()
         
     }
@@ -57,6 +73,18 @@ window.onload = function() {
             }
         }
         return output
+    }
+
+    function checkForRowsWins(data) {
+
+    }
+
+    function checkForColumnWins(data) {
+
+    }
+
+    function checkForDiagonalWins(data) {
+
     }
 }
 
