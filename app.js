@@ -51,7 +51,22 @@ window.onload = function() {
         document.getElementById('gameBar').textContent = player + "'s turn!"
         document.getElementById('gameBar').style.color = playerColor
         let gameData = sendCellData()
-        
+        let state = checkForRowsWins(gameData)
+        let state2 = checkForColumnWins(gameData)
+        if (state !== null) {
+            if (state.player === true) {
+                alert(gameStats.playerTwo + ' won!')
+            } else {
+                alert(gameStats.playerOne + ' won!')
+            }
+        }
+        if (state2 !== null) {
+            if (state2.player === true) {
+                alert(gameStats.playerTwo + ' won!')
+            } else {
+                alert(gameStats.playerOne + ' won!')
+            }
+        }
     }
 
     function sendCellData() {
@@ -76,11 +91,46 @@ window.onload = function() {
     }
 
     function checkForRowsWins(data) {
-
+        let win = {
+            player: null,
+            checks: 1
+        }
+        for (let i = 0; i < data.length; i++) {
+            for (let z = 0; z < data[i].length; z++) {
+                let cell = data[i][z]
+                if (cell.text === true) {
+                    if (win.player === null) {
+                        win.player = cell.player
+                    } else if (win.player !== cell.player) {
+                        break;
+                    } else {
+                        win.checks++
+                    }
+                }
+            }
+            if (win.checks === 3) {
+                return win
+            }
+            win = {
+                player: null,
+                checks: 1
+            }
+        }
+        return null
     }
 
     function checkForColumnWins(data) {
-
+        let newData = [
+            new Array(3),
+            new Array(3),
+            new Array(3)
+        ]
+        for (let i = 0; i < data.length; i++) {
+            newData[i][0] = data[2][i]
+            newData[i][1] = data[1][i]
+            newData[i][2] = data[0][i]
+        }        
+        return checkForRowsWins(newData)
     }
 
     function checkForDiagonalWins(data) {
