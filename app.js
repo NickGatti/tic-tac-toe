@@ -11,12 +11,11 @@ window.onload = function() {
         gameBoard: newGameBoard()
     }
 
-    renderBoard()
-
     document.getElementById('app').addEventListener('click', function(e) {
         handleCellClick(e)
     })
 
+    renderBoard()
     setPlayers()
     renderGameStatsBar()
     handlePlayerSelection()
@@ -53,22 +52,9 @@ window.onload = function() {
         }
     }
 
-    function setBoard(x, y) {
-        gameStats.gameBoard[x][y].text = true
-        gameStats.gameBoard[x][y].player = gameStats.player
-        renderBoard()
-    }
-
-    function setPlayers() {
-        let playerOne = 'Nick' //window.prompt('Enter play one\'s name')
-        let playerTwo = 'Donny' //window.prompt('Enter play two\'s name')
-        gameStats.playerOne = playerOne
-        gameStats.playerTwo = playerTwo
-    }
-
     function renderPlayerTurnBar() {
-        color = getPlayerColor()
-        player = getPlayerName()
+        let color = getPlayerColor()
+        let player = getPlayerName()
         document.getElementById('turnBar').textContent = player + "'s turn!"
         document.getElementById('turnBar').style.color = color
     }
@@ -93,48 +79,6 @@ window.onload = function() {
         }        
     }
 
-    function handlePlayerSelection() {
-        let startingPlayer = null
-        if (gameStats.lastWinner === true) {
-            startingPlayer = gameStats.playerTwo
-            gameStats.player = true
-        } else {
-            startingPlayer = gameStats.playerOne
-            gameStats.player = false
-        }
-        color = getPlayerColor()
-        renderPlayerTurnBar(startingPlayer, color)
-    }
-
-    function handleGameEnd(draw, winner, winnerFlag) {
-        gameStats.totalChecked = 0
-        if (!draw) {
-            if (winner === gameStats.playerTwo) {
-                gameStats.playerTwoWins++
-            } else {
-                gameStats.playerOneWins++
-            }
-            renderGameStatsBar()
-            handleGameWin(winner, winnerFlag)
-        } else {
-            gameStats.draws++
-            renderGameStatsBar()
-            handleGameDraw()
-        }
-        gameStats.gameBoard = newGameBoard()
-        renderBoard()
-        handlePlayerSelection()
-    }
-
-    function handleGameWin(winner, winnerFlag) {
-        alert(winner + ' won!')
-        gameStats.lastWinner = winnerFlag
-    }
-
-    function handleGameDraw() {
-        alert('Draw!')
-    }
-
     function getEventTargetCoordinates(e) {
         let cellNum = e.target.id.replace('cell_num_', '')
         let x = Math.floor(cellNum / 3)
@@ -142,32 +86,18 @@ window.onload = function() {
         return [x, y]
     }
 
-    function handleCellClick(e) {
-        let [x, y] = getEventTargetCoordinates(e)
-        if (gameStats.gameBoard[x][y].text) {
-            return
-        } else {
-            setBoard(x, y)
-            handleSwitchPlayer()
-            getWinData()
+    function getAllRowsColumnsAndDiagonals(data) {
+        let state = getRowsWins(data)
+        if (state === null) {
+            state = getColumnWins(data)
+            if (state === null) {
+                state = getDiagonalWins(data)
+            }
         }
+        return state
     }
 
-    function handleTotalPlays() {
-        gameStats.totalChecked++
-        if (gameStats.totalChecked === 9) {
-            handleGameEnd(true)
-        }
-    }
-
-    function handleSwitchPlayer() {
-        gameStats.player = !gameStats.player
-        color = getPlayerColor()
-        player = getPlayerName()
-        renderPlayerTurnBar(player, color)
-    }
-
-    function handleRowsWins(data) {
+    function getRowsWins(data) {
         let win = {
             player: null,
             checks: 1
@@ -196,7 +126,7 @@ window.onload = function() {
         return null
     }
 
-    function handleColumnWins(data) {
+    function getColumnWins(data) {
         let newData = [
             new Array(3),
             new Array(3),
@@ -207,10 +137,10 @@ window.onload = function() {
             newData[i][1] = data[1][i]
             newData[i][2] = data[0][i]
         }        
-        return handleRowsWins(newData)
+        return getRowsWins(newData)
     }
 
-    function handleDiagonalWins(data) {
+    function getDiagonalWins(data) {
         let newData = [
             new Array(3),
             new Array(3)
@@ -223,23 +153,123 @@ window.onload = function() {
         newData[1][1] = data[1][1]
         newData[1][2] = data[0][2]
 
-        return handleRowsWins(newData)
+        return getRowsWins(newData)
     }
 
-    function handleAllRowsColumnsAndDiagonals(data) {
-        let state = handleRowsWins(data)
-        if (state === null) {
-            state = handleColumnWins(data)
-            if (state === null) {
-                state = handleDiagonalWins(data)
-            }
+    function getLastWinner() {
+        return gameStats.lastWinner
+    }
+
+    function setBoard(x, y) {
+        gameStats.gameBoard[x][y].text = true
+        gameStats.gameBoard[x][y].player = gameStats.player
+        renderBoard()
+    }
+
+    function setPlayers() {
+        let playerOne = 'Nick' //window.prompt('Enter play one\'s name')
+        let playerTwo = 'Donny' //window.prompt('Enter play two\'s name')
+        gameStats.playerOne = playerOne
+        gameStats.playerTwo = playerTwo
+    }
+
+    function setSwitchPlayer() {
+        gameStats.player = !gameStats.player
+        let color = getPlayerColor()
+        let player = getPlayerName()
+        renderPlayerTurnBar(player, color)
+    }
+
+    function setWhichPlayer(player) {
+        gameStats.player = player
+    }
+
+    function setAddPlayerScore(winner) {
+        if (winner === gameStats.playerTwo) {
+            gameStats.playerTwoWins++
+        } else {
+            gameStats.playerOneWins++
         }
-        return state
     }
 
-    function getWinData() {
+    function setAddDrawScore() {
+        gameStats.draws++
+    }
+
+    function setNewGameBoard() {
+        gameStats.gameBoard = newGameBoard()
+    }
+
+    function setResetTotalChecked() {
+        gameStats.totalChecked = 0
+    }
+
+    function setAddToTotalChecked() {
+        gameStats.totalChecked++
+    }
+
+    function setLastWinnerFlag(winnerFlag) {
+        gameStats.lastWinner = winnerFlag
+    }
+
+    function handlePlayerSelection() {
+        let lastWinner = getLastWinner()
+        if (lastWinner) {
+            setWhichPlayer(true)
+        } else {
+            setWhichPlayer(false)
+        }
+        let startingPlayer = getPlayerName()
+        let color = getPlayerColor()
+        renderPlayerTurnBar(startingPlayer, color)
+    }
+    
+    function handleGameEnd(draw, winner, winnerFlag) {
+        setResetTotalChecked()
+        if (!draw) {
+            setAddPlayerScore(winner)
+            renderGameStatsBar()
+            handleGameWin(winner, winnerFlag)
+        } else {
+            setAddDrawScore()
+            renderGameStatsBar()
+            handleGameDraw()
+        }
+        setNewGameBoard()
+        renderBoard()
+        handlePlayerSelection()
+    }
+
+    function handleGameWin(winner, winnerFlag) {
+        alert(winner + ' won!')
+        setLastWinnerFlag(winnerFlag)
+    }
+
+    function handleGameDraw() {
+        alert('Draw!')
+    }
+
+    function handleCellClick(e) {
+        let [x, y] = getEventTargetCoordinates(e)
+        if (gameStats.gameBoard[x][y].text) {
+            return
+        } else {
+            setBoard(x, y)
+            setSwitchPlayer()
+            handleWinData()
+        }
+    }
+
+    function handleTotalPlays() {
+        setAddToTotalChecked()
+        if (gameStats.totalChecked === 9) {
+            handleGameEnd(true)
+        }
+    }
+
+    function handleWinData() {
         let gameData = gameStats.gameBoard
-        let state = handleAllRowsColumnsAndDiagonals(gameData)
+        let state = getAllRowsColumnsAndDiagonals(gameData)
         if (state !== null) {
             if (state.player === true) {
                 setTimeout(function() {
