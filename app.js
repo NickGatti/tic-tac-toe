@@ -60,7 +60,27 @@ window.onload = function() {
     }
 
     function renderGameStatsBar() {
-        document.getElementById('gameBar').textContent = `${gameStats.draws} Draws : ${gameStats.playerOneWins} ${gameStats.playerOne} Wins : ${gameStats.playerTwoWins} ${gameStats.playerTwo} Wins`
+        let draws = getDraws()
+        let playerOneWins = getPlayerOneWins()
+        let playerOne = getPlayerNameByPlayer(false)
+        let playerTwoWins = getPlayerTwoWins()
+        let playerTwo = getPlayerNameByPlayer(true)
+        let text =  `${draws} Draws :` +
+                    `${playerOneWins} ${playerOne} Wins : `+
+                    `${playerTwoWins} ${playerTwo} Wins`
+        document.getElementById('gameBar').textContent = text
+    }
+
+    function getPlayerTwoWins() {
+        return gameStats.playerTwoWins
+    }
+
+    function getPlayerOneWins() {
+        return gameStats.playerOneWins
+    }
+
+    function getDraws() {
+        return gameStats.draws
     }
 
     function getPlayerColor() {
@@ -160,6 +180,22 @@ window.onload = function() {
         return gameStats.lastWinner
     }
 
+    function getDivAtCoordinates(x, y) {
+        return gameStats.gameBoard[x][y]
+    }
+
+    function getTotalChecked() {
+        return gameStats.totalChecked
+    }
+
+    function getGameBoard() {
+        return gameStats.gameBoard
+    }
+
+    function getPlayerNameByPlayer(player) {
+        return player ? gameStats.playerTwo : gameStats.playerOne
+    }
+
     function setBoard(x, y) {
         gameStats.gameBoard[x][y].text = true
         gameStats.gameBoard[x][y].player = gameStats.player
@@ -251,7 +287,8 @@ window.onload = function() {
 
     function handleCellClick(e) {
         let [x, y] = getEventTargetCoordinates(e)
-        if (gameStats.gameBoard[x][y].text) {
+        let node = getDivAtCoordinates(x, y)
+        if (node.text) {
             return
         } else {
             setBoard(x, y)
@@ -262,22 +299,25 @@ window.onload = function() {
 
     function handleTotalPlays() {
         setAddToTotalChecked()
-        if (gameStats.totalChecked === 9) {
+        let totalChecked = getTotalChecked()
+        if (totalChecked === 9) {
             handleGameEnd(true)
         }
     }
 
     function handleWinData() {
-        let gameData = gameStats.gameBoard
+        let gameData = getGameBoard()
         let state = getAllRowsColumnsAndDiagonals(gameData)
         if (state !== null) {
-            if (state.player === true) {
+            if (state.player) {
                 setTimeout(function() {
-                    handleGameEnd(false, gameStats.playerTwo, true)
+                    let playerTwo = getPlayerNameByPlayer(true)
+                    handleGameEnd(false, playerTwo, true)
                 }, 50)
             } else {
                 setTimeout(function() {
-                    handleGameEnd(false, gameStats.playerOne, false)
+                    let playerOne = getPlayerNameByPlayer(false)
+                    handleGameEnd(false, playerOne, false)
                 }, 50)
             }
         } else {
