@@ -11,14 +11,18 @@ window.onload = function() {
         gameBoard: newGameBoard()
     }
 
-    document.getElementById('app').addEventListener('click', function(e) {
-        handleCellClick(e)
-    })
+    init()
 
-    renderBoard()
-    setPlayers()
-    renderGameStatsBar()
-    handlePlayerSelection()
+    function init() {
+        document.getElementById('app').addEventListener('click', function(e) {
+            handleCellClick(e)
+        })
+    
+        renderBoard()
+        setPlayers()
+        renderGameStatsBar()
+        handlePlayerSelection()
+    }
 
     function newGameBoard() {
         return [
